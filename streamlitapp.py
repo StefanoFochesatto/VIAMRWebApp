@@ -5,7 +5,7 @@ from stpyvista import stpyvista
 from firedrake import *
 from viamr import VIAMR
 from viamr.utility import SphereObstacleProblem
-# from viamr.utility import SpiralObstacleProblem
+from viamr.utility import SpiralObstacleProblem
 
 
 # Use wide layout
@@ -22,8 +22,8 @@ def solve_problem_cached(max_iterations, problem, initTriHeight, RefinementMetho
     # Pick which problem to instantiate
     if problem == "Sphere":
         problem_instance = SphereObstacleProblem(TriHeight=initTriHeight)
-    # elif problem == "Spiral":
-    #     problem_instance = SpiralObstacleProblem(TriHeight=initTriHeight)
+    elif problem == "Spiral":
+        problem_instance = SpiralObstacleProblem(TriHeight=initTriHeight)
 
     amr_instance = VIAMR()
     mesh_history = [None]

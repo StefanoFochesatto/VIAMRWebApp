@@ -170,6 +170,7 @@ RUN curl -O https://raw.githubusercontent.com/firedrakeproject/firedrake/master/
     cd ../ && git clone https://github.com/viskex/viskex.git && \
     cd viskex && pip install '.[tutorials]' && \
     pip install stpyvista && pip install streamlit && \
-    cd ../ && git clone https://github.com/StefanoFochesatto/VIAMRWebApp.git "
+    cd ../ && git clone https://github.com/StefanoFochesatto/VIAMRWebApp.git && \
+    cd VIAMRWebApp && streamlit run streamlitapp.py "
 
 
