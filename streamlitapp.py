@@ -51,6 +51,7 @@ def solve_problem_cached(max_iterations, problem, initTriHeight, RefinementMetho
         mesh = mesh.refine_marked_elements(mark)
         mesh_history.append(mesh)
 
+    print('Finished Calculations')
     return solutions, marks
 
 
@@ -151,6 +152,7 @@ if st.session_state.solutions and st.session_state.marks:
     # -----------------------------------------
     # Plot the solution
     # -----------------------------------------
+    print("Generating Scalar Plotter Object")
     sol_plotter = viskex.firedrake_plotter.FiredrakePlotter.plot_scalar_field(
         current_solution,
         "Solution",
@@ -162,6 +164,7 @@ if st.session_state.solutions and st.session_state.marks:
         (0, 0, 1),   # up direction
     ]
 
+    print("Generating stpyvista scalar")
     st.subheader("Solution")
     stpyvista(
         sol_plotter,
@@ -172,6 +175,8 @@ if st.session_state.solutions and st.session_state.marks:
     # -----------------------------------------
     # Plot the mark function
     # -----------------------------------------
+    print("Generating Marking Plotter Object")
+
     mark_plotter = viskex.firedrake_plotter.FiredrakePlotter.plot_scalar_field(
         current_mark,
         "Refinement Mark",
@@ -180,6 +185,7 @@ if st.session_state.solutions and st.session_state.marks:
     # Match the same camera as the solution, if desired
     mark_plotter.camera_position = sol_plotter.camera_position
 
+    print("Generating stpyvista marking")
     st.subheader("Mark Function")
     stpyvista(
         mark_plotter,
