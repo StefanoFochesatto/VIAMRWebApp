@@ -182,7 +182,7 @@ if st.session_state.solutions and st.session_state.marks:
     mark_plotter.camera_position = sol_plotter.camera_position
 
     print("Generating stpyvista marking")
-    st.subheader("Mesh")
+    st.subheader("Mark Function")
     stpyvista(
         mark_plotter,
         use_container_width=True,

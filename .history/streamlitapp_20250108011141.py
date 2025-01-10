@@ -22,21 +22,21 @@ def solve_problem_cached(max_iterations, problem, initTriHeight, RefinementMetho
     # Pick which problem to instantiate
     if problem == "Sphere":
         problem_instance = SphereObstacleProblem(TriHeight=initTriHeight)
-        mesh_history = [problem_instance.setInitialMesh()]
-
     elif problem == "Spiral":
         problem_instance = SpiralObstacleProblem(TriHeight=initTriHeight)
-        mesh_history = [problem_instance.setInitialMesh()]
 
     amr_instance = VIAMR()
+    mesh_history = [None]
     solutions = []
+    marks = []
     u = None
 
     for i in range(max_iterations):
-        mesh = mesh_history[i]
         # Solve PDE on current mesh with initial guess u
-        u, lb = problem_instance.solveProblem(mesh=mesh_history[i], u=u)
+        u, lb, mesh = problem_instance.solveProblem(mesh=mesh_history[i], u=u)
 
+        # Mark elements for refinement
+        CG1, _ = amr_instance.spaces(mesh)
         if RefinementMethod == "UDO":
             mark = amr_instance.udomark(mesh, u, lb, n=neighbors)
         elif RefinementMethod == "VCES":
@@ -44,20 +44,21 @@ def solve_problem_cached(max_iterations, problem, initTriHeight, RefinementMetho
 
         # Store the solution and the mark function for this iteration
         solutions.append(u)
+        # viskex doesn't plot dg0
+        marks.append(Function(CG1).interpolate(mark))
 
         # Refine mesh for next iteration
         mesh = mesh.refine_marked_elements(mark)
         mesh_history.append(mesh)
 
-    print('Finished Calculations')
-    return solutions, mesh_history
+    return solutions, marks
 
 
 # ------------------------------------------------------------------
 # SIDEBAR
 # ------------------------------------------------------------------
 with st.sidebar:
-    st.title("Adaptation Parameters")
+    st.title("Simulation Parameters")
 
     problem = st.selectbox(
         "Select Problem Type:",
@@ -89,16 +90,16 @@ with st.sidebar:
     if RefinementMethod == "VCES":
         vcesupper = st.slider(
             "VCES Upper Bound:",
-            min_value=0.5,
+            min_value=0.0,
             max_value=1.0,
-            value=0.65,
+            value=0.5,
             step=0.01
         )
         vceslower = st.slider(
             "VCES Lower Bound:",
             min_value=0.0,
-            max_value=0.5,
-            value=0.45,
+            max_value=1.0,
+            value=0.5,
             step=0.01
         )
         bracket = [vceslower, vcesupper]
@@ -128,7 +129,7 @@ if "marks" not in st.session_state:
 # ------------------------------------------------------------------
 # MAIN AREA
 # ------------------------------------------------------------------
-st.title("Obstacle Problem Solver with AMR")
+st.title("Firedrake Solution Solver")
 
 if st.session_state.solutions and st.session_state.marks:
     solutions = st.session_state.solutions
@@ -150,7 +151,6 @@ if st.session_state.solutions and st.session_state.marks:
     # -----------------------------------------
     # Plot the solution
     # -----------------------------------------
-    print("Generating Scalar Plotter Object")
     sol_plotter = viskex.firedrake_plotter.FiredrakePlotter.plot_scalar_field(
         current_solution,
         "Solution",
@@ -162,7 +162,6 @@ if st.session_state.solutions and st.session_state.marks:
         (0, 0, 1),   # up direction
     ]
 
-    print("Generating stpyvista scalar")
     st.subheader("Solution")
     stpyvista(
         sol_plotter,
@@ -173,16 +172,15 @@ if st.session_state.solutions and st.session_state.marks:
     # -----------------------------------------
     # Plot the mark function
     # -----------------------------------------
-    print("Generating Marking Plotter Object")
-
-    mark_plotter = viskex.firedrake_plotter.FiredrakePlotter.plot_mesh(
-        current_mark
+    mark_plotter = viskex.firedrake_plotter.FiredrakePlotter.plot_scalar_field(
+        current_mark,
+        "Refinement Mark",
+        warp_factor=0.5,  # Typically you'd want no warping or very small warping
     )
     # Match the same camera as the solution, if desired
     mark_plotter.camera_position = sol_plotter.camera_position
 
-    print("Generating stpyvista marking")
-    st.subheader("Mesh")
+    st.subheader("Mark Function")
     stpyvista(
         mark_plotter,
         use_container_width=True,

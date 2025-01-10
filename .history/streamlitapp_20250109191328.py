@@ -37,6 +37,8 @@ def solve_problem_cached(max_iterations, problem, initTriHeight, RefinementMetho
         # Solve PDE on current mesh with initial guess u
         u, lb = problem_instance.solveProblem(mesh=mesh_history[i], u=u)
 
+        # Mark elements for refinement
+        CG1, _ = amr_instance.spaces(mesh)
         if RefinementMethod == "UDO":
             mark = amr_instance.udomark(mesh, u, lb, n=neighbors)
         elif RefinementMethod == "VCES":
@@ -182,7 +184,7 @@ if st.session_state.solutions and st.session_state.marks:
     mark_plotter.camera_position = sol_plotter.camera_position
 
     print("Generating stpyvista marking")
-    st.subheader("Mesh")
+    st.subheader("Mark Function")
     stpyvista(
         mark_plotter,
         use_container_width=True,
