@@ -55,7 +55,7 @@ def solve_problem_cached(max_iterations, problem, initTriHeight, RefinementMetho
 # Run precomputation on app start if not already cached
 
 
-@st.cache_resource
+@st.cache_data
 def precompute():
     # Precompute with specific parameters
     return solve_problem_cached(2, "Sphere", 0.3, "VCES", bracket=[0.2, 0.8])

@@ -52,21 +52,6 @@ def solve_problem_cached(max_iterations, problem, initTriHeight, RefinementMetho
     print('Finished Calculations')
     return solutions, mesh_history
 
-# Run precomputation on app start if not already cached
-
-
-@st.cache_resource
-def precompute():
-    # Precompute with specific parameters
-    return solve_problem_cached(2, "Sphere", 0.3, "VCES", bracket=[0.2, 0.8])
-
-
-# Precompute and store results in session state
-if "precomputed_solutions" not in st.session_state or "precomputed_marks" not in st.session_state:
-    precomp_sols, precomp_marks = precompute()
-    st.session_state.precomputed_solutions = precomp_sols
-    st.session_state.precomputed_marks = precomp_marks
-
 
 # ------------------------------------------------------------------
 # SIDEBAR
