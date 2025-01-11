@@ -54,7 +54,7 @@ def solve_problem_cached(max_iterations, problem, initTriHeight, RefinementMetho
 
     mark_plotters = []
     for mesh in mesh_history:
-        plotter = viskex.firedrake_plotter.FiredrakePlotter.plot_mesh(mesh)
+        plotter = viskex.firedrake_plotter.FiredrakePlotter.plot_mesh(mark)
         plotter.camera_position = camera_position
         mark_plotters.append(plotter)
 
