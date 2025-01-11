@@ -5,7 +5,7 @@ services:
     build:
       context: ./backend
     volumes:
-      - ./backend/storage:/app/storage
+      - storage:/app/storage
     ports:
       - "5000:5000"
 
@@ -17,4 +17,7 @@ services:
     depends_on:
       - backend
     volumes:
-      - ./backend/storage:/app/storage
+      - storage:/app/storage
+
+volumes:
+  storage:

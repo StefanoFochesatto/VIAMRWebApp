@@ -21,4 +21,4 @@ RUN pip install -r requirements.txt
 
 
 # Start Xvfb and then the Streamlit app
-CMD ["bash", "-c", "Xvfb :99 -screen 0 1024x768x16 & streamlit run app.py --server.port=8501 --server.address=0.0.0.0"]
+CMD ["bash", "-c", "streamlit run app.py --server.port=8501 --server.address=0.0.0.0"]
