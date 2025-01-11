@@ -1,0 +1,23 @@
+# frontend/Dockerfile
+FROM python:3.9-slim
+
+# 1) Install X11/OpenGL libraries needed by VTK
+RUN apt-get update && apt-get install -y \
+    libx11-6 \
+    libxext6 \
+    libxrender1 \
+    libsm6 \
+    libgl1-mesa-glx \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# 2) Copy + install Python requirements
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 3) Copy your Dash app
+COPY app.py .
+
+EXPOSE 8050
+CMD ["python", "app.py"]

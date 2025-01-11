@@ -65,6 +65,10 @@ def solve_problem_cached(max_iterations, problem, initTriHeight, RefinementMetho
     return solution_plotters, mark_plotters
 
 
+@st.cache_resource
+def precompute():
+    return solve_problem_cached(2, "Sphere", 0.3, "VCES", bracket=[0.2, 0.8])
+
 # Sidebar and UI elements
 
 

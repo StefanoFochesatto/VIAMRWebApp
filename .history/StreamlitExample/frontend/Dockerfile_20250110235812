@@ -1,0 +1,19 @@
+FROM python:3.9-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y \
+    libx11-6 \
+    libxext6 \
+    libxrender1 \
+    xvfb \
+    libsm6 \
+    libgl1-mesa-glx \
+    && rm -rf /var/lib/apt/lists/*
+
+
+COPY app.py requirements.txt /app/
+RUN pip install -r requirements.txt
+
+# Start Xvfb before running Streamlit
+CMD ["bash", "-c", "Xvfb :99 -screen 0 1024x768x24 & export DISPLAY=:99 && streamlit run app.py --server.port=8501 --server.address=0.0.0.0"]

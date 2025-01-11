@@ -1,0 +1,26 @@
+# docker-compose.yml
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: backend_service
+    volumes:
+      - ./shared_data:/app/shared_data
+    ports:
+      - "5000:5000" # We expose a port so the frontend can call /generate endpoint
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: frontend_service
+    # We'll mount the same shared_data folder read-only
+    volumes:
+      - ./shared_data:/app/shared_data:ro
+    ports:
+      - "8050:8050"
+    depends_on:
+      - backend
+    restart: always
