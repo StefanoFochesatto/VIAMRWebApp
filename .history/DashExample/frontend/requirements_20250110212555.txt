@@ -1,4 +1,0 @@
-dash==2.9.3
-dash_vtk
-requests==2.31.0
-pyvista==0.38.4

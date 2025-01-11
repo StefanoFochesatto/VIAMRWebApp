@@ -1,4 +1,0 @@
-dash==2.9.3
-dash_vtk==0.0.9
-requests==2.31.0
-vtk==9.2.6

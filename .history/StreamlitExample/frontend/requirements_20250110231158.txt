@@ -1,4 +1,0 @@
-streamlit
-stpyvista
-pyvista
-requests
