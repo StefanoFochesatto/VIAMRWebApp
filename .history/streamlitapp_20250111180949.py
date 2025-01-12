@@ -225,11 +225,10 @@ if st.session_state.solutions and st.session_state.marks:
     marks = st.session_state.marks
     num_solutions = len(solutions)
 
-    iteration_to_view = st.selectbox(
+    iteration_to_view = st.select_slider(
         "Iteration:",
-        options=range(num_solutions),
-        index=0,
-        format_func=lambda i: f"Iteration {i + 1}",
+        options=list(range(num_solutions)),
+        value=0,
         help="Select which iteration to visualize"
     )
 
