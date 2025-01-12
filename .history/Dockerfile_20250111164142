@@ -5,15 +5,17 @@ FROM stefanofochesatto/viamr:latest
 USER root
 
 # Update apt-get repositories and install system dependencies
-RUN apt-get update && apt-get install -y \
-    software-properties-common && \
-    add-apt-repository universe && \
-    apt-get update && \
-    apt-get install -y \
-    libgl1 \
-    libglx-mesa0 \
-    xvfb \
-    && rm -rf /var/lib/apt/lists/*
+#RUN apt-get update && apt-get install -y \
+#    software-properties-common && \
+#    add-apt-repository universe && \
+#    apt-get update && \
+#    apt-get install -y \
+#    libx11-6 \
+#    libxext6 \
+#    libxrender1 \
+#    xvfb \
+#    libsm6 \
+#    && rm -rf /var/lib/apt/lists/*
 # Ensure the installed libraries are accessible by all users
 RUN chmod -R 755 /usr/lib/x86_64-linux-gnu
 

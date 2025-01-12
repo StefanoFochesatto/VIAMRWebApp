@@ -10,9 +10,12 @@ RUN apt-get update && apt-get install -y \
     add-apt-repository universe && \
     apt-get update && \
     apt-get install -y \
-    libgl1 \
-    libglx-mesa0 \
+    libx11-6 \
+    libxext6 \
+    libxrender1 \
     xvfb \
+    libsm6 \
+    libgl1-mesa-dev \
     && rm -rf /var/lib/apt/lists/*
 # Ensure the installed libraries are accessible by all users
 RUN chmod -R 755 /usr/lib/x86_64-linux-gnu
@@ -47,6 +50,9 @@ RUN bash -c "source firedrake/bin/activate && \
 
 # Clone the Streamlit application repository
 RUN git clone https://github.com/StefanoFochesatto/VIAMRWebApp.git
+
+# Pre-run Streamlit to build the cache
+RUN bash -c "source firedrake/bin/activate && cd /home/firedrake/VIAMRWebApp && streamlit run streamlitapp.py --server.address 0.0.0.0 --server.port 7860 & sleep 20 && pkill streamlit"
 
 # Expose the application port
 EXPOSE 7860

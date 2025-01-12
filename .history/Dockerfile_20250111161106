@@ -10,9 +10,11 @@ RUN apt-get update && apt-get install -y \
     add-apt-repository universe && \
     apt-get update && \
     apt-get install -y \
-    libgl1 \
-    libglx-mesa0 \
+    libx11-6 \
+    libxext6 \
+    libxrender1 \
     xvfb \
+    libsm6 \
     && rm -rf /var/lib/apt/lists/*
 # Ensure the installed libraries are accessible by all users
 RUN chmod -R 755 /usr/lib/x86_64-linux-gnu
