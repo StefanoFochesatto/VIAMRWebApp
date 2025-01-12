@@ -30,8 +30,6 @@ if "refinement_settings" not in st.session_state:
     }
 if "has_results" not in st.session_state:
     st.session_state.has_results = False
-if "solving" not in st.session_state:
-    st.session_state.solving = False
 
 
 def solve_problem_cached(max_iterations, problem, initTriHeight, RefinementMethod, bracket=None, neighbors=None):
@@ -106,7 +104,6 @@ def clear_results():
     st.session_state.solutions = []
     st.session_state.marks = []
     st.session_state.has_results = False
-    st.session_state.solving = False
     st.rerun()
 
 
@@ -120,7 +117,7 @@ with st.sidebar:
             "Select Problem Type:",
             options=["Sphere", "Spiral"],
             help="Choose the type of obstacle problem to solve",
-            disabled=st.session_state.has_results or st.session_state.solving
+            disabled=st.session_state.has_results
         )
 
         initTriHeight = st.number_input(
@@ -129,7 +126,7 @@ with st.sidebar:
             value=0.45,
             step=0.05,
             help="Set the initial height of triangles in the mesh",
-            disabled=st.session_state.has_results or st.session_state.solving
+            disabled=st.session_state.has_results
         )
 
         max_iterations = st.number_input(
@@ -138,7 +135,7 @@ with st.sidebar:
             value=1,
             step=1,
             help="Maximum number of refinement iterations to perform",
-            disabled=st.session_state.has_results or st.session_state.solving
+            disabled=st.session_state.has_results
         )
 
     with st.expander("⚙️ Refinement Settings", expanded=True):
@@ -147,10 +144,10 @@ with st.sidebar:
             options=["VCES", "UDO"],
             index=0 if st.session_state.refinement_settings["method"] == "VCES" else 1,
             help="Choose the method for mesh refinement",
-            disabled=st.session_state.has_results or st.session_state.solving
+            disabled=st.session_state.has_results
         )
 
-        if st.session_state.has_results or st.session_state.solving:
+        if st.session_state.has_results:
             st.info("Clear results to modify parameters")
 
         st.session_state.refinement_settings["method"] = new_method
@@ -172,7 +169,7 @@ with st.sidebar:
                 value=st.session_state.refinement_settings["vces_lower"],
                 step=0.01,
                 help="Lower bound for VCES refinement",
-                disabled=st.session_state.has_results or st.session_state.solving
+                disabled=st.session_state.has_results
             )
             st.session_state.refinement_settings["vces_upper"] = vcesupper
             st.session_state.refinement_settings["vces_lower"] = vceslower
@@ -185,7 +182,7 @@ with st.sidebar:
                 value=st.session_state.refinement_settings["udo_neighbors"],
                 step=1,
                 help="Depth of neighborhood for UDO refinement",
-                disabled=st.session_state.has_results or st.session_state.solving
+                disabled=st.session_state.has_results
             )
             st.session_state.refinement_settings["udo_neighbors"] = neighbors
             bracket = None
@@ -197,15 +194,17 @@ with st.sidebar:
             "🚀 Solve",
             help="Start the simulation with current parameters",
             use_container_width=True,
-            disabled=st.session_state.has_results or st.session_state.solving
+            disabled=st.session_state.has_results
         )
     with col2:
         if st.button("🔄 Clear", help="Clear current results", use_container_width=True):
             clear_results()
 
     if solve_button:
-        st.session_state.solving = True
+        # Set has_results immediately after solve button is pressed
         st.session_state.has_results = True
+        st.rerun()  # Reload the sidebar to disable controls
+
         solution_plotters, mark_plotters = solve_problem_cached(
             max_iterations, problem, initTriHeight,
             new_method, bracket, neighbors
@@ -213,9 +212,6 @@ with st.sidebar:
         if solution_plotters and mark_plotters:
             st.session_state.solutions = solution_plotters
             st.session_state.marks = mark_plotters
-        st.session_state.solving = False
-        st.rerun()
-
 
 # Main Area
 st.title("Visualization")

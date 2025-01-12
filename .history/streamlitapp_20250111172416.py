@@ -28,8 +28,6 @@ if "refinement_settings" not in st.session_state:
         "vces_lower": 0.45,
         "udo_neighbors": 3
     }
-if "has_results" not in st.session_state:
-    st.session_state.has_results = False
 if "solving" not in st.session_state:
     st.session_state.solving = False
 
@@ -102,14 +100,6 @@ def solve_problem_cached(max_iterations, problem, initTriHeight, RefinementMetho
         return None, None
 
 
-def clear_results():
-    st.session_state.solutions = []
-    st.session_state.marks = []
-    st.session_state.has_results = False
-    st.session_state.solving = False
-    st.rerun()
-
-
 # Sidebar and UI elements
 with st.sidebar:
     st.title("Obstacle Problem Solver")
@@ -119,8 +109,7 @@ with st.sidebar:
         problem = st.selectbox(
             "Select Problem Type:",
             options=["Sphere", "Spiral"],
-            help="Choose the type of obstacle problem to solve",
-            disabled=st.session_state.has_results or st.session_state.solving
+            help="Choose the type of obstacle problem to solve"
         )
 
         initTriHeight = st.number_input(
@@ -128,8 +117,7 @@ with st.sidebar:
             min_value=0.1,
             value=0.45,
             step=0.05,
-            help="Set the initial height of triangles in the mesh",
-            disabled=st.session_state.has_results or st.session_state.solving
+            help="Set the initial height of triangles in the mesh"
         )
 
         max_iterations = st.number_input(
@@ -137,22 +125,21 @@ with st.sidebar:
             min_value=1,
             value=1,
             step=1,
-            help="Maximum number of refinement iterations to perform",
-            disabled=st.session_state.has_results or st.session_state.solving
+            help="Maximum number of refinement iterations to perform"
         )
 
     with st.expander("⚙️ Refinement Settings", expanded=True):
+        # Store the current method before potentially changing it
+        current_method = st.session_state.refinement_settings["method"]
+
         new_method = st.selectbox(
             "Refinement Method:",
             options=["VCES", "UDO"],
-            index=0 if st.session_state.refinement_settings["method"] == "VCES" else 1,
-            help="Choose the method for mesh refinement",
-            disabled=st.session_state.has_results or st.session_state.solving
+            index=0 if current_method == "VCES" else 1,
+            help="Choose the method for mesh refinement"
         )
 
-        if st.session_state.has_results or st.session_state.solving:
-            st.info("Clear results to modify parameters")
-
+        # Update the method in session state
         st.session_state.refinement_settings["method"] = new_method
 
         if new_method == "VCES":
@@ -162,8 +149,7 @@ with st.sidebar:
                 max_value=1.0,
                 value=st.session_state.refinement_settings["vces_upper"],
                 step=0.01,
-                help="Upper bound for VCES refinement",
-                disabled=st.session_state.has_results
+                help="Upper bound for VCES refinement"
             )
             vceslower = st.slider(
                 "VCES Lower Bound:",
@@ -171,8 +157,7 @@ with st.sidebar:
                 max_value=0.5,
                 value=st.session_state.refinement_settings["vces_lower"],
                 step=0.01,
-                help="Lower bound for VCES refinement",
-                disabled=st.session_state.has_results or st.session_state.solving
+                help="Lower bound for VCES refinement"
             )
             st.session_state.refinement_settings["vces_upper"] = vcesupper
             st.session_state.refinement_settings["vces_lower"] = vceslower
@@ -184,28 +169,20 @@ with st.sidebar:
                 min_value=1,
                 value=st.session_state.refinement_settings["udo_neighbors"],
                 step=1,
-                help="Depth of neighborhood for UDO refinement",
-                disabled=st.session_state.has_results or st.session_state.solving
+                help="Depth of neighborhood for UDO refinement"
             )
             st.session_state.refinement_settings["udo_neighbors"] = neighbors
             bracket = None
 
     st.markdown("---")
-    col1, col2 = st.columns([2, 1])
-    with col1:
-        solve_button = st.button(
-            "🚀 Solve",
-            help="Start the simulation with current parameters",
-            use_container_width=True,
-            disabled=st.session_state.has_results or st.session_state.solving
-        )
-    with col2:
-        if st.button("🔄 Clear", help="Clear current results", use_container_width=True):
-            clear_results()
+    solve_button = st.button(
+        "🚀 Solve",
+        help="Start the simulation with current parameters",
+        use_container_width=True,
+    )
 
     if solve_button:
         st.session_state.solving = True
-        st.session_state.has_results = True
         solution_plotters, mark_plotters = solve_problem_cached(
             max_iterations, problem, initTriHeight,
             new_method, bracket, neighbors
@@ -214,8 +191,6 @@ with st.sidebar:
             st.session_state.solutions = solution_plotters
             st.session_state.marks = mark_plotters
         st.session_state.solving = False
-        st.rerun()
-
 
 # Main Area
 st.title("Visualization")

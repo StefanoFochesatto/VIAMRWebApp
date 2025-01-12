@@ -163,7 +163,7 @@ with st.sidebar:
                 value=st.session_state.refinement_settings["vces_upper"],
                 step=0.01,
                 help="Upper bound for VCES refinement",
-                disabled=st.session_state.has_results
+                disabled=st.session_state.has_results or st.session_state.solving
             )
             vceslower = st.slider(
                 "VCES Lower Bound:",
@@ -205,7 +205,6 @@ with st.sidebar:
 
     if solve_button:
         st.session_state.solving = True
-        st.session_state.has_results = True
         solution_plotters, mark_plotters = solve_problem_cached(
             max_iterations, problem, initTriHeight,
             new_method, bracket, neighbors
@@ -213,9 +212,8 @@ with st.sidebar:
         if solution_plotters and mark_plotters:
             st.session_state.solutions = solution_plotters
             st.session_state.marks = mark_plotters
+            st.session_state.has_results = True
         st.session_state.solving = False
-        st.rerun()
-
 
 # Main Area
 st.title("Visualization")

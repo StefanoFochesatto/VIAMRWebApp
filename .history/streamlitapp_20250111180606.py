@@ -163,7 +163,7 @@ with st.sidebar:
                 value=st.session_state.refinement_settings["vces_upper"],
                 step=0.01,
                 help="Upper bound for VCES refinement",
-                disabled=st.session_state.has_results
+                disabled=st.session_state.has_results or st.session_state.solving
             )
             vceslower = st.slider(
                 "VCES Lower Bound:",
